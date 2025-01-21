@@ -1,0 +1,55 @@
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container Styling */
+.container {
+    max-width: 600px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+}
+
+/* Heading Styling */
+h1 {
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* Form Styling */
+.form-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Recommendation Section */
+#recommendations {
+    padding: 20px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
