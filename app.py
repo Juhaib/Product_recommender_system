@@ -8,7 +8,7 @@ import os
 # Configure Streamlit to use the correct port
 if "PORT" in os.environ:
     port = int(os.environ["PORT"])
-    st.set_option("server.port", port)
+    # st.set_option("server.port", port)
 
 # Load dataset dynamically
 data_path = os.path.join(os.path.dirname(__file__), 'data', 'amazon.csv')
