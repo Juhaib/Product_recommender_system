@@ -21,8 +21,8 @@ df['discounted_price'] = df['discounted_price'].replace({'₹': '', ',': ''}, re
 df['actual_price'] = df['actual_price'].replace({'₹': '', ',': ''}, regex=True).astype(float)
 df['text_features'] = df['product_name'] + " " + df['about_product']
 
-# Ensure product_id is an integer
-df['product_id'] = df['product_id'].astype(int)
+# Ensure product_id is treated as a string (not converting to int)
+df['product_id'] = df['product_id'].astype(str)
 
 # Vectorize text features
 tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
@@ -43,15 +43,13 @@ def recommend_content_based(product_id, n_recommendations=5):
 st.title("Product Recommendation System")
 st.write("Enter a Product ID to get recommendations:")
 
-# Input for Product ID (ensure it's an integer)
+# Input for Product ID (ensure it's a string)
 product_id_input = st.text_input("Product ID")
 if st.button("Get Recommendations"):
-    # Check if the product_id_input is a valid number
-    if product_id_input.isdigit():
-        product_id = int(product_id_input)
-        
-        if product_id in df['product_id'].values:
-            selected_product = df[df['product_id'] == product_id].iloc[0]
+    # Check if the product_id_input is valid (non-empty)
+    if product_id_input:
+        if product_id_input in df['product_id'].values:
+            selected_product = df[df['product_id'] == product_id_input].iloc[0]
 
             # Display the selected product information
             st.subheader(f"Selected Product: {selected_product['product_name']}")
@@ -63,7 +61,7 @@ if st.button("Get Recommendations"):
             st.write(f"[View Product]({selected_product['product_link']})")
 
             # Display recommendations
-            recommendations = recommend_content_based(product_id)
+            recommendations = recommend_content_based(product_id_input)
             if recommendations:
                 st.write("Here are the top recommendations:")
                 for _, rec in recommendations.iterrows():
@@ -77,7 +75,7 @@ if st.button("Get Recommendations"):
         else:
             st.error("Product ID not found in the dataset.")
     else:
-        st.error("Invalid Product ID. Please enter a valid number.")
+        st.error("Please enter a valid Product ID.")
 
 
 
