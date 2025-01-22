@@ -21,6 +21,9 @@ df['discounted_price'] = df['discounted_price'].replace({'₹': '', ',': ''}, re
 df['actual_price'] = df['actual_price'].replace({'₹': '', ',': ''}, regex=True).astype(float)
 df['text_features'] = df['product_name'] + " " + df['about_product']
 
+# Ensure product_id is an integer
+df['product_id'] = df['product_id'].astype(int)
+
 # Vectorize text features
 tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
 tfidf_matrix = tfidf.fit_transform(df['text_features'])
@@ -40,35 +43,42 @@ def recommend_content_based(product_id, n_recommendations=5):
 st.title("Product Recommendation System")
 st.write("Enter a Product ID to get recommendations:")
 
-product_id = st.text_input("Product ID")
+# Input for Product ID (ensure it's an integer)
+product_id_input = st.text_input("Product ID")
 if st.button("Get Recommendations"):
-    if product_id and product_id.isdigit() and int(product_id) in df['product_id'].values:
-        product_id = int(product_id)
-        selected_product = df[df['product_id'] == product_id].iloc[0]
+    # Check if the product_id_input is a valid number
+    if product_id_input.isdigit():
+        product_id = int(product_id_input)
+        
+        if product_id in df['product_id'].values:
+            selected_product = df[df['product_id'] == product_id].iloc[0]
 
-        # Display the selected product information
-        st.subheader(f"Selected Product: {selected_product['product_name']}")
-        st.write(f"**Category:** {selected_product['category']}")
-        st.write(f"**Discounted Price:** ₹{selected_product['discounted_price']}")
-        st.write(f"**Rating:** {selected_product['rating']} (from {selected_product['rating_count']} reviews)")
-        st.write(f"**About Product:** {selected_product['about_product']}")
-        st.image(selected_product['img_link'], caption=selected_product['product_name'], width=200)
-        st.write(f"[View Product]({selected_product['product_link']})")
+            # Display the selected product information
+            st.subheader(f"Selected Product: {selected_product['product_name']}")
+            st.write(f"**Category:** {selected_product['category']}")
+            st.write(f"**Discounted Price:** ₹{selected_product['discounted_price']}")
+            st.write(f"**Rating:** {selected_product['rating']} (from {selected_product['rating_count']} reviews)")
+            st.write(f"**About Product:** {selected_product['about_product']}")
+            st.image(selected_product['img_link'], caption=selected_product['product_name'], width=200)
+            st.write(f"[View Product]({selected_product['product_link']})")
 
-        # Display recommendations
-        recommendations = recommend_content_based(product_id)
-        if recommendations:
-            st.write("Here are the top recommendations:")
-            for _, rec in recommendations.iterrows():
-                st.write(f"- **{rec['product_name']}**")
-                st.write(f"  **Discounted Price:** ₹{rec['discounted_price']}")
-                st.write(f"  **Rating:** {rec['rating']}")
-                st.image(rec['img_link'], width=100)
-                st.write(f"[View Product]({rec['product_link']})")
+            # Display recommendations
+            recommendations = recommend_content_based(product_id)
+            if recommendations:
+                st.write("Here are the top recommendations:")
+                for _, rec in recommendations.iterrows():
+                    st.write(f"- **{rec['product_name']}**")
+                    st.write(f"  **Discounted Price:** ₹{rec['discounted_price']}")
+                    st.write(f"  **Rating:** {rec['rating']}")
+                    st.image(rec['img_link'], width=100)
+                    st.write(f"[View Product]({rec['product_link']})")
+            else:
+                st.warning("No recommendations found for this Product ID.")
         else:
-            st.warning("No recommendations found for this Product ID.")
+            st.error("Product ID not found in the dataset.")
     else:
-        st.error("Invalid Product ID. Please enter a valid Product ID.")
+        st.error("Invalid Product ID. Please enter a valid number.")
+
 
 
 
