@@ -37,7 +37,7 @@ def recommend_content_based(product_id, n_recommendations=5):
         recommendations = df.iloc[similar_indices][['product_name', 'discounted_price', 'rating', 'product_link', 'img_link']]
         return recommendations
     except IndexError:
-        return []
+        return pd.DataFrame()  # Return an empty DataFrame if no recommendations found
 
 # Streamlit Interface
 st.title("Product Recommendation System")
@@ -62,7 +62,7 @@ if st.button("Get Recommendations"):
 
             # Display recommendations
             recommendations = recommend_content_based(product_id_input)
-            if recommendations:
+            if not recommendations.empty:
                 st.write("Here are the top recommendations:")
                 for _, rec in recommendations.iterrows():
                     st.write(f"- **{rec['product_name']}**")
@@ -76,6 +76,89 @@ if st.button("Get Recommendations"):
             st.error("Product ID not found in the dataset.")
     else:
         st.error("Please enter a valid Product ID.")
+
+
+
+
+
+# import streamlit as st
+# import pandas as pd
+# import numpy as np
+# from sklearn.metrics.pairwise import cosine_similarity
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# import os
+
+# # Configure Streamlit to use the correct port
+# if "PORT" in os.environ:
+#     port = int(os.environ["PORT"])
+
+# # Load dataset dynamically
+# data_path = os.path.join(os.path.dirname(__file__), 'data', 'amazon.csv')
+# df = pd.read_csv(data_path)
+
+# # Data Cleaning and Preprocessing
+# df['rating'] = df['rating'].replace(r'[^0-9.]', '', regex=True)
+# df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
+# df['rating'].fillna(df['rating'].mean(), inplace=True)
+# df['discounted_price'] = df['discounted_price'].replace({'₹': '', ',': ''}, regex=True).astype(float)
+# df['actual_price'] = df['actual_price'].replace({'₹': '', ',': ''}, regex=True).astype(float)
+# df['text_features'] = df['product_name'] + " " + df['about_product']
+
+# # Ensure product_id is treated as a string (not converting to int)
+# df['product_id'] = df['product_id'].astype(str)
+
+# # Vectorize text features
+# tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
+# tfidf_matrix = tfidf.fit_transform(df['text_features'])
+# cosine_sim = cosine_similarity(tfidf_matrix)
+
+# # Recommendation Function
+# def recommend_content_based(product_id, n_recommendations=5):
+#     try:
+#         product_idx = df[df['product_id'] == product_id].index[0]
+#         similar_indices = np.argsort(-cosine_sim[product_idx])[1:1 + n_recommendations]
+#         recommendations = df.iloc[similar_indices][['product_name', 'discounted_price', 'rating', 'product_link', 'img_link']]
+#         return recommendations
+#     except IndexError:
+#         return []
+
+# # Streamlit Interface
+# st.title("Product Recommendation System")
+# st.write("Enter a Product ID to get recommendations:")
+
+# # Input for Product ID (ensure it's a string)
+# product_id_input = st.text_input("Product ID")
+# if st.button("Get Recommendations"):
+#     # Check if the product_id_input is valid (non-empty)
+#     if product_id_input:
+#         if product_id_input in df['product_id'].values:
+#             selected_product = df[df['product_id'] == product_id_input].iloc[0]
+
+#             # Display the selected product information
+#             st.subheader(f"Selected Product: {selected_product['product_name']}")
+#             st.write(f"**Category:** {selected_product['category']}")
+#             st.write(f"**Discounted Price:** ₹{selected_product['discounted_price']}")
+#             st.write(f"**Rating:** {selected_product['rating']} (from {selected_product['rating_count']} reviews)")
+#             st.write(f"**About Product:** {selected_product['about_product']}")
+#             st.image(selected_product['img_link'], caption=selected_product['product_name'], width=200)
+#             st.write(f"[View Product]({selected_product['product_link']})")
+
+#             # Display recommendations
+#             recommendations = recommend_content_based(product_id_input)
+#             if recommendations:
+#                 st.write("Here are the top recommendations:")
+#                 for _, rec in recommendations.iterrows():
+#                     st.write(f"- **{rec['product_name']}**")
+#                     st.write(f"  **Discounted Price:** ₹{rec['discounted_price']}")
+#                     st.write(f"  **Rating:** {rec['rating']}")
+#                     st.image(rec['img_link'], width=100)
+#                     st.write(f"[View Product]({rec['product_link']})")
+#             else:
+#                 st.warning("No recommendations found for this Product ID.")
+#         else:
+#             st.error("Product ID not found in the dataset.")
+#     else:
+#         st.error("Please enter a valid Product ID.")
 
 
 
